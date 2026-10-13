@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gym Tracker">
+  <title>Gym Tracker</title>
+  <style>
+    :root {
+      --bg: #121214;
+      --card: #1e1e24;
+      --accent: #10b981;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
+      --border: #2e2e38;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 80px; }
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #2a2a35;
+      color: var(--text);
+      font-size: 1rem;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:active { opacity: 0.8; }
+    
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .history-header h2 { font-size: 1.1rem; }
+    .btn-clear {
+      background: transparent;
+      color: var(--danger);
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      width: auto;
+      border: 1px solid var(--danger);
+    }
+
+    .log-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .log-info strong { display: block; font-size: 1rem; color: var(--text); }
+    .log-info span { font-size: 0.85rem; color: var(--text-muted); }
+    .btn-del {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-size: 1.2rem;
+      width: auto;
+      padding: 4px 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Gym Log</h1>
+  </header>
+
+  <div class="card">
+    <div class="form-group">
+      <label for="exercise">Ejercicio</label>
+      <input type="text" id="exercise" placeholder="Ej. Press banca, Sentadilla..." autocomplete="off">
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label for="weight">Peso (kg / lb)</label>
+        <input type="number" id="weight" step="0.5" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label for="reps">Repeticiones</label>
+        <input type="number" id="reps" placeholder="0">
+      </div>
+    </div>
+
+    <button onclick="addEntry()">Registrar serie</button>
+  </div>
+
+  <div class="history-header">
+    <h2>Historial reciente</h2>
+    <button class="btn-clear" onclick="clearAll()">Borrar todo</button>
+  </div>
+
+  <div id="logList"></div>
+
+  <script>
+    const STORAGE_KEY = 'gym_records_data';
+
+    function getEntries() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function addEntry() {
+      const exerciseInput = document.getElementById('exercise');
+      const weightInput = document.getElementById('weight');
+      const repsInput = document.getElementById('reps');
+
+      const name = exerciseInput.value.trim();
+      const weight = weightInput.value;
+      const reps = repsInput.value;
+
+      if (!name || !weight || !reps) {
+        alert('Por favor completa todos los campos.');
+        return;
+      }
+
+      const newRecord = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+        name: name,
+        weight: weight,
+        reps: reps
+      };
+
+      const entries = getEntries();
+      entries.unshift(newRecord);
+      saveEntries(entries);
+
+      renderEntries();
+
+      // Dejar el ejercicio seleccionado para registrar series subsecuentes
+      weightInput.value = '';
+      repsInput.value = '';
+    }
+
+    function deleteEntry(id) {
+      const entries = getEntries().filter(e => e.id !== id);
+      saveEntries(entries);
+      renderEntries();
+    }
+
+    function clearAll() {
+      if (confirm('¿Eliminar todos los registros guardados?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderEntries();
+      }
+    }
+
+    function renderEntries() {
+      const list = document.getElementById('logList');
+      const entries = getEntries();
+
+      if (entries.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Sin registros aún.</p>';
+        return;
+      }
+
+      list.innerHTML = entries.map(item => `
+        <div class="log-item">
+          <div class="log-info">
+            <strong>${item.name}</strong>
+            <span>${item.date} • ${item.weight} kg × ${item.reps} reps</span>
+          </div>
+          <button class="btn-del" onclick="deleteEntry(${item.id})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    // Cargar registros al abrir
+    renderEntries();
+  </script>
+</body>
+</html>
