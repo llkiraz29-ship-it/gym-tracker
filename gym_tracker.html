@@ -6,92 +6,75 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Gym Tracker">
-  <title>Gym Tracker</title>
+  <title>Gym Tracker Pro</title>
   <style>
     :root {
-      --bg: #121214;
-      --card: #1e1e24;
+      --bg: #121216;
+      --card: #1c1c24;
       --accent: #10b981;
+      --accent-dim: #065f46;
+      --blue: #3b82f6;
       --text: #f3f4f6;
       --text-muted: #9ca3af;
       --danger: #ef4444;
-      --border: #2e2e38;
+      --border: #2c2c38;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 80px; }
-    header { text-align: center; margin-bottom: 20px; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 90px; }
+    header { text-align: center; margin-bottom: 16px; }
     header h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
-    
-    .card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border: 1px solid var(--border);
+
+    /* Tabs navegación */
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn {
+      flex: 1; padding: 10px; border: 1px solid var(--border); background: var(--card);
+      color: var(--text-muted); border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
     }
+    .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* Tarjetas y formularios */
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
+    .card h2 { font-size: 1.05rem; margin-bottom: 12px; color: var(--text); }
     .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
+    label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
     input, select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #2a2a35;
-      color: var(--text);
-      font-size: 1rem;
+      width: 100%; padding: 11px; border-radius: 8px; border: 1px solid var(--border);
+      background: #252530; color: var(--text); font-size: 1rem;
     }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     
-    button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: opacity 0.2s;
+    button.btn-primary {
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      background: var(--accent); color: #fff; font-weight: 600; font-size: 1rem; cursor: pointer;
     }
     button:active { opacity: 0.8; }
-    
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .history-header h2 { font-size: 1.1rem; }
-    .btn-clear {
-      background: transparent;
-      color: var(--danger);
-      font-size: 0.8rem;
-      padding: 4px 8px;
-      width: auto;
-      border: 1px solid var(--danger);
-    }
 
+    /* Cronómetro */
+    .timer-display { font-size: 3rem; font-weight: 800; text-align: center; color: var(--text); margin: 10px 0; font-variant-numeric: tabular-nums; }
+    .timer-presets { display: flex; gap: 6px; margin-bottom: 12px; }
+    .timer-presets button {
+      flex: 1; padding: 8px; background: #252530; border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+    }
+    .timer-actions { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
+    .btn-timer-toggle { padding: 12px; border: none; border-radius: 8px; background: var(--blue); color: white; font-weight: 600; font-size: 1rem; }
+    .btn-timer-reset { padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Gráfica */
+    #chartCanvas { width: 100%; height: 210px; background: #16161d; border-radius: 8px; border: 1px solid var(--border); }
+    .chart-empty { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0; }
+
+    /* Historial */
+    .filters-bar { display: flex; gap: 8px; margin-bottom: 12px; }
     .log-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
     }
-    .log-info strong { display: block; font-size: 1rem; color: var(--text); }
-    .log-info span { font-size: 0.85rem; color: var(--text-muted); }
-    .btn-del {
-      background: none;
-      border: none;
-      color: var(--danger);
-      font-size: 1.2rem;
-      width: auto;
-      padding: 4px 8px;
-    }
+    .log-info strong { display: block; font-size: 0.95rem; }
+    .log-info span { font-size: 0.8rem; color: var(--text-muted); }
+    .btn-del { background: none; border: none; color: var(--danger); font-size: 1.2rem; padding: 4px 8px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -100,36 +83,102 @@
     <h1>Gym Log</h1>
   </header>
 
-  <div class="card">
-    <div class="form-group">
-      <label for="exercise">Ejercicio</label>
-      <input type="text" id="exercise" placeholder="Ej. Press banca, Sentadilla..." autocomplete="off">
-    </div>
-
-    <div class="grid-2">
-      <div class="form-group">
-        <label for="weight">Peso (kg / lb)</label>
-        <input type="number" id="weight" step="0.5" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label for="reps">Repeticiones</label>
-        <input type="number" id="reps" placeholder="0">
-      </div>
-    </div>
-
-    <button onclick="addEntry()">Registrar serie</button>
+  <!-- Pestañas de navegación -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('registro')">Registrar</button>
+    <button class="tab-btn" onclick="switchTab('progreso')">Progreso</button>
+    <button class="tab-btn" onclick="switchTab('historial')">Historial</button>
   </div>
 
-  <div class="history-header">
-    <h2>Historial reciente</h2>
-    <button class="btn-clear" onclick="clearAll()">Borrar todo</button>
+  <!-- VISTA 1: REGISTRAR & CRONÓMETRO -->
+  <div id="view-registro" class="view-section active">
+    <!-- Cronómetro -->
+    <div class="card">
+      <h2>Descanso entre series</h2>
+      <div class="timer-display" id="timerDisplay">01:30</div>
+      <div class="timer-presets">
+        <button onclick="setTimerPreset(60)">1 min</button>
+        <button onclick="setTimerPreset(90)">1:30</button>
+        <button onclick="setTimerPreset(120)">2 min</button>
+        <button onclick="setTimerPreset(180)">3 min</button>
+      </div>
+      <div class="timer-actions">
+        <button class="btn-timer-toggle" id="btnTimerToggle" onclick="toggleTimer()">Iniciar</button>
+        <button class="btn-timer-reset" onclick="resetTimer()">Reiniciar</button>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="card">
+      <h2>Nueva serie</h2>
+      <div class="form-group">
+        <label for="exercise">Ejercicio</label>
+        <input type="text" id="exercise" placeholder="Ej. Press banca, Sentadilla..." autocomplete="off">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="weight">Peso (kg / lb)</label>
+          <input type="number" id="weight" step="0.5" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label for="reps">Repeticiones</label>
+          <input type="number" id="reps" placeholder="0">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addEntry()">Guardar serie</button>
+    </div>
   </div>
 
-  <div id="logList"></div>
+  <!-- VISTA 2: GRÁFICAS DE PROGRESO -->
+  <div id="view-progreso" class="view-section">
+    <div class="card">
+      <h2>Evolución de fuerza</h2>
+      <div class="form-group">
+        <label for="chartExerciseSelect">Selecciona ejercicio:</label>
+        <select id="chartExerciseSelect" onchange="renderChart()"></select>
+      </div>
+      <canvas id="chartCanvas" width="340" height="210"></canvas>
+      <div id="chartStats" style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); text-align: center;"></div>
+    </div>
+  </div>
+
+  <!-- VISTA 3: HISTORIAL Y FILTROS -->
+  <div id="view-historial" class="view-section">
+    <div class="filters-bar">
+      <select id="filterPeriod" onchange="renderHistory()">
+        <option value="today">Hoy</option>
+        <option value="week">Últimos 7 días</option>
+        <option value="month">Últimos 30 días</option>
+        <option value="all" selected>Todo el historial</option>
+      </select>
+    </div>
+    <div id="historyList"></div>
+  </div>
 
   <script>
     const STORAGE_KEY = 'gym_records_data';
 
+    /* --- GESTIÓN DE PESTAÑAS --- */
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+      
+      if (tab === 'registro') {
+        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById('view-registro').classList.add('active');
+      } else if (tab === 'progreso') {
+        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById('view-progreso').classList.add('active');
+        populateChartExercises();
+        renderChart();
+      } else if (tab === 'historial') {
+        document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
+        document.getElementById('view-historial').classList.add('active');
+        renderHistory();
+      }
+    }
+
+    /* --- BASE DE DATOS LOCAL --- */
     function getEntries() {
       return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     }
@@ -139,73 +188,256 @@
     }
 
     function addEntry() {
-      const exerciseInput = document.getElementById('exercise');
-      const weightInput = document.getElementById('weight');
-      const repsInput = document.getElementById('reps');
+      const exInput = document.getElementById('exercise');
+      const wInput = document.getElementById('weight');
+      const rInput = document.getElementById('reps');
 
-      const name = exerciseInput.value.trim();
-      const weight = weightInput.value;
-      const reps = repsInput.value;
+      const name = exInput.value.trim();
+      const weight = parseFloat(wInput.value);
+      const reps = parseInt(rInput.value, 10);
 
-      if (!name || !weight || !reps) {
+      if (!name || isNaN(weight) || isNaN(reps)) {
         alert('Por favor completa todos los campos.');
         return;
       }
 
-      const newRecord = {
+      const entries = getEntries();
+      entries.unshift({
         id: Date.now(),
-        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+        timestamp: Date.now(),
         name: name,
         weight: weight,
         reps: reps
-      };
-
-      const entries = getEntries();
-      entries.unshift(newRecord);
+      });
       saveEntries(entries);
 
-      renderEntries();
+      wInput.value = '';
+      rInput.value = '';
 
-      // Dejar el ejercicio seleccionado para registrar series subsecuentes
-      weightInput.value = '';
-      repsInput.value = '';
+      // Al registrar, arrancar descanso automáticamente
+      startTimer();
     }
 
     function deleteEntry(id) {
-      const entries = getEntries().filter(e => e.id !== id);
+      let entries = getEntries().filter(e => e.id !== id);
       saveEntries(entries);
-      renderEntries();
+      renderHistory();
     }
 
-    function clearAll() {
-      if (confirm('¿Eliminar todos los registros guardados?')) {
-        localStorage.removeItem(STORAGE_KEY);
-        renderEntries();
+    /* --- CRONÓMETRO Y SONIDO SINTETIZADO --- */
+    let timerDuration = 90;
+    let timerRemaining = 90;
+    let timerInterval = null;
+
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = 880; // La (A5)
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+        setTimeout(() => osc.stop(), 600);
+      } catch (e) {}
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerRemaining / 60);
+      const secs = timerRemaining % 60;
+      document.getElementById('timerDisplay').innerText = 
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function setTimerPreset(seconds) {
+      pauseTimer();
+      timerDuration = seconds;
+      timerRemaining = seconds;
+      updateTimerDisplay();
+    }
+
+    function toggleTimer() {
+      if (timerInterval) pauseTimer();
+      else startTimer();
+    }
+
+    function startTimer() {
+      if (timerRemaining <= 0) timerRemaining = timerDuration;
+      clearInterval(timerInterval);
+      document.getElementById('btnTimerToggle').innerText = 'Pausar';
+      document.getElementById('btnTimerToggle').style.background = 'var(--accent)';
+      
+      timerInterval = setInterval(() => {
+        timerRemaining--;
+        updateTimerDisplay();
+        if (timerRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          document.getElementById('btnTimerToggle').innerText = 'Iniciar';
+          document.getElementById('btnTimerToggle').style.background = 'var(--blue)';
+          playBeep();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('btnTimerToggle').innerText = 'Iniciar';
+      document.getElementById('btnTimerToggle').style.background = 'var(--blue)';
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timerRemaining = timerDuration;
+      updateTimerDisplay();
+    }
+
+    /* --- HISTORIAL Y FILTROS POR FECHA --- */
+    function renderHistory() {
+      const filter = document.getElementById('filterPeriod').value;
+      const list = document.getElementById('historyList');
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+
+      let entries = getEntries();
+
+      if (filter === 'today') {
+        const startOfToday = new Date().setHours(0, 0, 0, 0);
+        entries = entries.filter(e => e.timestamp >= startOfToday);
+      } else if (filter === 'week') {
+        entries = entries.filter(e => (now - e.timestamp) <= (7 * oneDay));
+      } else if (filter === 'month') {
+        entries = entries.filter(e => (now - e.timestamp) <= (30 * oneDay));
       }
-    }
-
-    function renderEntries() {
-      const list = document.getElementById('logList');
-      const entries = getEntries();
 
       if (entries.length === 0) {
-        list.innerHTML = '<p style="color: var(--text-muted); text-align: center; font-size: 0.9rem;">Sin registros aún.</p>';
+        list.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px;">Sin registros para este periodo.</p>';
         return;
       }
 
-      list.innerHTML = entries.map(item => `
-        <div class="log-item">
-          <div class="log-info">
-            <strong>${item.name}</strong>
-            <span>${item.date} • ${item.weight} kg × ${item.reps} reps</span>
+      list.innerHTML = entries.map(item => {
+        const dateStr = new Date(item.timestamp).toLocaleDateString('es-ES', { 
+          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' 
+        });
+        return `
+          <div class="log-item">
+            <div class="log-info">
+              <strong>${item.name}</strong>
+              <span>${dateStr} • <b>${item.weight} kg</b> × ${item.reps} reps</span>
+            </div>
+            <button class="btn-del" onclick="deleteEntry(${item.id})">✕</button>
           </div>
-          <button class="btn-del" onclick="deleteEntry(${item.id})">✕</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    // Cargar registros al abrir
-    renderEntries();
+    /* --- GRÁFICAS DE PROGRESO (CANVAS 100% OFFLINE) --- */
+    function populateChartExercises() {
+      const entries = getEntries();
+      const select = document.getElementById('chartExerciseSelect');
+      const currentSelection = select.value;
+      const uniqueExercises = [...new Set(entries.map(e => e.name.trim()))];
+
+      select.innerHTML = '';
+      if (uniqueExercises.length === 0) {
+        select.innerHTML = '<option value="">Sin datos aún</option>';
+        return;
+      }
+
+      uniqueExercises.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+
+      if (uniqueExercises.includes(currentSelection)) {
+        select.value = currentSelection;
+      }
+    }
+
+    function renderChart() {
+      const canvas = document.getElementById('chartCanvas');
+      const ctx = canvas.getContext('2d');
+      const exercise = document.getElementById('chartExerciseSelect').value;
+      const statsDiv = document.getElementById('chartStats');
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!exercise) {
+        statsDiv.innerHTML = 'Registra ejercicios para ver la gráfica.';
+        return;
+      }
+
+      // Filtrar y ordenar cronológicamente
+      const entries = getEntries()
+        .filter(e => e.name.trim().toLowerCase() === exercise.toLowerCase())
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+      if (entries.length < 2) {
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Registra al menos 2 series para trazar la curva', canvas.width / 2, canvas.height / 2);
+        statsDiv.innerHTML = `Registros actuales: ${entries.length}`;
+        return;
+      }
+
+      const weights = entries.map(e => e.weight);
+      const minWeight = Math.min(...weights) * 0.9;
+      const maxWeight = Math.max(...weights) * 1.1;
+      const padX = 40;
+      const padY = 30;
+      const w = canvas.width - padX * 2;
+      const h = canvas.height - padY * 2;
+
+      // Dibujar cuadrícula
+      ctx.strokeStyle = '#2c2c38';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padX, padY + h);
+      ctx.lineTo(padX + w, padY + h);
+      ctx.stroke();
+
+      // Puntos y línea
+      const points = entries.map((e, i) => {
+        const x = padX + (i / (entries.length - 1)) * w;
+        const y = padY + h - ((e.weight - minWeight) / (maxWeight - minWeight)) * h;
+        return { x, y, weight: e.weight };
+      });
+
+      // Trazar línea
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      points.forEach((p, idx) => {
+        if (idx === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      });
+      ctx.stroke();
+
+      // Dibujar círculos y etiquetas de peso
+      points.forEach(p => {
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f3f4f6';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${p.weight}k`, p.x, p.y - 8);
+      });
+
+      const maxRecorded = Math.max(...weights);
+      const lastRecorded = weights[weights.length - 1];
+      statsDiv.innerHTML = `Récord: <b>${maxRecorded} kg</b> • Último registrado: <b>${lastRecorded} kg</b>`;
+    }
+
+    // Inicializar visualización
+    updateTimerDisplay();
   </script>
 </body>
 </html>
